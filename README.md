@@ -6,19 +6,20 @@ A Metalsmith plugin for registering Handlebars partials.
 
 ## CLI Usage
 
-Install via npm and then add the `metalsmith-register-partials` key to your `metalsmith.json` plugins, like so:
+Install via `npm i AnthonyAtZinid/metalsmith-register-partials` then add the `metalsmith-register-partials` key to your `metalsmith.json` plugins, something like so:
 
 ```
 {
   "plugins": {
     "metalsmith-register-partials": {
-      "directory": "path/to/partials"
+      "directory": "partials"
+	  "suffix": ".html.handlebars"
     }
   }
 }
 ```
 
-This will register all partials in the specified directory and use the first part of the filename as the partial name.
+This will register all files sith the suffic .html in the specified directory (relative to your source) and use the first part of the filename as the partial name.
 
 ## License
 

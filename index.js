@@ -11,14 +11,11 @@ function plugin(ops) {
 
 	return function(files, metalsmith, done) {
 		_.forEach(files, (file, filename) => {
-			// TODO: Pass in file pattern for partials finding & use in template naming?
-			const pattern = `${options.directory}/**/*.html.handlebars`
+			const pattern = `${options.directory}/**/*${options.suffix}`
 			if (multimatch(filename, pattern).length) {
-				// TODO: Get rid of these replace hacks
 				const templateName = filename
-					.replace('.html', '')
-					.replace('.handlebars', '')
-					.replace('partials/', '')
+					.replace(new RegExp(`${options.suffix}$`), '')
+					.replace(new RegExp(`^${options.directory}/`), '')
 				const templateContents = file.contents.toString()
 				handlebars.registerPartial(templateName, templateContents)
 			}
