@@ -13,13 +13,13 @@ Install via `npm i AnthonyAtZinid/metalsmith-register-partials` then add the `me
   "plugins": {
     "metalsmith-register-partials": {
       "directory": "partials"
-	  "suffix": ".html.handlebars"
+	  "suffix": ".html"
     }
   }
 }
 ```
 
-This will register all files sith the suffic .html in the specified directory (relative to your source) and use the first part of the filename as the partial name.
+This will register all files with the suffix `.html` in the directory `partials` (relative to your source) and use the path after `partials` and entire filename minus `.html` as the partial name.
 
 ## License
 
