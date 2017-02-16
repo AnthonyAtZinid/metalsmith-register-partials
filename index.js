@@ -9,21 +9,38 @@ function plugin(ops) {
 		directory: 'partials'
 	}, ops || {})
 
-	return function(metalsmithFiles, metalsmith, done) {
-		fs.readdir(metalsmith.path(options.directory), (err, redFiles) => {
+	function registerAllIn(basePath, subPath, metalsmith, done) {
+		const actualPath = `${basePath}${subPath}`
+		fs.readdir(metalsmith.path(actualPath), (err, redFiles) => {
 			if (err) {
 				throw err
 			}
 
 			_.forEach(redFiles, (file) => {
-				const templateName = file.replace('.html', '').replace('.handlebars', '')
-				const path = metalsmith.path(options.directory, file)
-				const partialContents = fs.readFileSync(path).toString('utf8')
-				handlebars.registerPartial(templateName, partialContents)
+				// Hack: Remove .html & .handlebar suffixes
+				const templateName = subPath + file
+					.replace('.html', '')
+					.replace('.handlebars', '')
+
+				const path = metalsmith.path(actualPath, file)
+				if (fs.lstatSync(path).isDirectory()) {
+					// Go deeper
+					registerAllIn(basePath, `${subPath}${file}/`, metalsmith)
+				} else {
+					const partialContents = fs.readFileSync(path).toString('utf8')
+					handlebars.registerPartial(templateName, partialContents)
+				}
 			})
 
-			done()
+			// Only done on final recursion
+			if (done) {
+				done()
+			}
 		})
+	}
+
+	return function(metalsmithFiles, metalsmith, done) {
+		registerAllIn(`${options.directory}/`, '', metalsmith, done)
 	}
 }
 
