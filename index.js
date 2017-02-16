@@ -1,7 +1,7 @@
 /* eslint-disable no-sync */
 const extend = require('extend')
-const fs = require('fs')
 const handlebars = require('handlebars')
+const multimatch = require('multimatch')
 const _ = require('lodash')
 
 function plugin(ops) {
@@ -9,38 +9,22 @@ function plugin(ops) {
 		directory: 'partials'
 	}, ops || {})
 
-	function registerAllIn(basePath, subPath, metalsmith, done) {
-		const actualPath = `${basePath}${subPath}`
-		fs.readdir(metalsmith.path(actualPath), (err, redFiles) => {
-			if (err) {
-				throw err
-			}
-
-			_.forEach(redFiles, (file) => {
-				// Hack: Remove .html & .handlebar suffixes
-				const templateName = subPath + file
+	return function(metalsmithFiles, metalsmith, done) {
+		_.forEach(metalsmithFiles, (metalsmithFile, metalsmithFilename) => {
+			// TODO: Pass in file pattern for partials finding & use in template naming?
+			const pattern = `${options.directory}/**/*.html.handlebars`
+			if (multimatch(metalsmithFilename, pattern).length) {
+				// TODO: Get rid of these replace hacks
+				const templateName = metalsmithFilename
 					.replace('.html', '')
 					.replace('.handlebars', '')
-
-				const path = metalsmith.path(actualPath, file)
-				if (fs.lstatSync(path).isDirectory()) {
-					// Go deeper
-					registerAllIn(basePath, `${subPath}${file}/`, metalsmith)
-				} else {
-					const partialContents = fs.readFileSync(path).toString('utf8')
-					handlebars.registerPartial(templateName, partialContents)
-				}
-			})
-
-			// Only done on final recursion
-			if (done) {
-				done()
+					.replace('partials/', '')
+				const templateContents = metalsmithFile.contents.toString()
+				handlebars.registerPartial(templateName, templateContents)
 			}
 		})
-	}
 
-	return function(metalsmithFiles, metalsmith, done) {
-		registerAllIn(`${options.directory}/`, '', metalsmith, done)
+		done()
 	}
 }
 
