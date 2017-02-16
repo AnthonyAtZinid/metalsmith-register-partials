@@ -1,26 +1,30 @@
-var extend = require('extend');
-var fs = require('fs');
-var handlebars = require('handlebars');
+/* eslint-disable no-sync */
+const extend = require('extend')
+const fs = require('fs')
+const handlebars = require('handlebars')
+const _ = require('lodash')
 
-module.exports = plugin;
+function plugin(ops) {
+	const options = extend({
+		directory: 'partials'
+	}, ops || {})
 
-function plugin(options) {
-  options = extend({
-    directory: 'partials'
-  }, options || {});
+	return function(metalsmithFiles, metalsmith, done) {
+		fs.readdir(metalsmith.path(options.directory), (err, redFiles) => {
+			if (err) {
+				throw err
+			}
 
-  return function(files, metalsmith, done) {
-    fs.readdir(metalsmith.path(options.directory), function(err,files){
-      if(err) throw err;
-      
-      files.forEach(function(file){
-		var templateName = file.replace('.html', '').replace('.handlebars', '')
-        var path = metalsmith.path(options.directory, file)
-        var partialContents = fs.readFileSync(path).toString('utf8');
-        handlebars.registerPartial(templateName, partialContents);
-      });
+			_.forEach(redFiles, (file) => {
+				const templateName = file.replace('.html', '').replace('.handlebars', '')
+				const path = metalsmith.path(options.directory, file)
+				const partialContents = fs.readFileSync(path).toString('utf8')
+				handlebars.registerPartial(templateName, partialContents)
+			})
 
-      done();
-    });
-  };
+			done()
+		})
+	}
 }
+
+module.exports = plugin

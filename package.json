@@ -26,6 +26,7 @@
     "url": "https://github.com/linclark/metalsmith-register-partials/issues"
   },
   "dependencies": {
-    "extend": "^2.0.0"
+    "extend": "^2.0.0",
+    "lodash": "^4.17.4"
   }
 }
