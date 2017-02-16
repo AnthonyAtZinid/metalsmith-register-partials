@@ -9,17 +9,17 @@ function plugin(ops) {
 		directory: 'partials'
 	}, ops || {})
 
-	return function(metalsmithFiles, metalsmith, done) {
-		_.forEach(metalsmithFiles, (metalsmithFile, metalsmithFilename) => {
+	return function(files, metalsmith, done) {
+		_.forEach(files, (file, filename) => {
 			// TODO: Pass in file pattern for partials finding & use in template naming?
 			const pattern = `${options.directory}/**/*.html.handlebars`
-			if (multimatch(metalsmithFilename, pattern).length) {
+			if (multimatch(filename, pattern).length) {
 				// TODO: Get rid of these replace hacks
-				const templateName = metalsmithFilename
+				const templateName = filename
 					.replace('.html', '')
 					.replace('.handlebars', '')
 					.replace('partials/', '')
-				const templateContents = metalsmithFile.contents.toString()
+				const templateContents = file.contents.toString()
 				handlebars.registerPartial(templateName, templateContents)
 			}
 		})
