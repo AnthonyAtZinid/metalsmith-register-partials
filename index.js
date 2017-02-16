@@ -14,7 +14,7 @@ function plugin(options) {
       if(err) throw err;
       
       files.forEach(function(file){
-        var templateName = file.split('.').shift();
+		var templateName = file.replace('.html', '').replace('.handlebars', '')
         var path = metalsmith.path(options.directory, file)
         var partialContents = fs.readFileSync(path).toString('utf8');
         handlebars.registerPartial(templateName, partialContents);
